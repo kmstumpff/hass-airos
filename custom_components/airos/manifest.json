@@ -1,0 +1,16 @@
+{
+  "domain": "airos",
+  "name": "airos",
+  "config_flow": true,
+  "documentation": "https://www.home-assistant.io/integrations/airos",
+  "requirements": [],
+  "ssdp": [],
+  "zeroconf": [],
+  "homekit": {},
+  "dependencies": [],
+  "codeowners": [
+    "@kmstumpff"
+  ],
+  "iot_class": "local_polling",
+  "version": "0.0.1"
+}
