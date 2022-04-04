@@ -27,6 +27,7 @@ class AuthorizationApi:
         response = session.post(host + Endpoints.AUTH.value, data=data)
 
         if response.status_code != 200:
+            self.logged_in = False
             raise Exception(f"login: error - {response.status_code}")
 
         json = response.json()
