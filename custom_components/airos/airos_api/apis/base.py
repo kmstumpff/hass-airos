@@ -7,11 +7,6 @@ class BaseApi:
     def __init__(self, session: Session):
         self.session = session
 
-        if not self.session.verify:
-            import urllib3
-
-            urllib3.disable_warnings()
-
     async def get(self, url: str, url_format_list: dict = None):
         if url_format_list:
             url = url.format(**url_format_list)

@@ -48,30 +48,29 @@ class AirOSApi:
                 await self.authorization.login(username, password)
             return True
         except Exception as ex:
+            print(f"Failed to login: {ex}")
             return False
 
     async def get_local_status(self) -> AirOSStatus:
         status = await self.status.get_status()
         return AirOSStatus(
-            {
-                "hostname": status.host.hostname,
-                "device_model": status.host.devmodel,
-                "uptime": status.host.uptime,
-                "cpu": status.host.cpuload,
-                "firmware_version": status.host.fwversion,
-                "gps_lat": status.gps.lat,
-                "gps_lon": status.gps.lon,
-                "mac": status.wireless.apmac,
-                "distance": status.wireless.distance,
-                "signal": status.wireless.sta[0].prs_sta.rssi_data,
-                "rx_data_rate": status.wireless.sta[0].prs_sta.rx_mcs,
-                "snr": status.wireless.sta[0].prs_sta.snr,
-                "capacity": status.wireless.sta[0].prs_sta.capacity,
-                "rx_throughput": status.wireless.throughput.rx,
-                "tx_throughput": status.wireless.throughput.tx,
-                "frequency": status.wireless.prs_info.frequency,
-                "bandwidth": status.wireless.prs_info.chanbw,
-            }
+            hostname=status.host.hostname,
+            device_model=status.host.devmodel,
+            uptime=status.host.uptime,
+            cpu=status.host.cpuload,
+            firmware_version=status.host.fwversion,
+            gps_lat=status.gps.lat,
+            gps_lon=status.gps.lon,
+            mac=status.wireless.apmac,
+            distance=status.wireless.distance,
+            signal=status.wireless.sta[0].prs_sta.rssi_data,
+            rx_data_rate=status.wireless.sta[0].prs_sta.rx_mcs,
+            snr=status.wireless.sta[0].prs_sta.snr,
+            capacity=status.wireless.sta[0].prs_sta.capacity,
+            rx_throughput=status.wireless.throughput.rx,
+            tx_throughput=status.wireless.throughput.tx,
+            frequency=status.wireless.prs_info.frequency,
+            bandwidth=status.wireless.prs_info.chanbw,
         )
 
     def get_host(self):

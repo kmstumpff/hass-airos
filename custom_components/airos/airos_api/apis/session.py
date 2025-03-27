@@ -1,26 +1,24 @@
-# import requests
-# import ssl
-
+import atexit
 import aiohttp
+import asyncio
 
 
 class Session:
     verify: bool
     host: str
     token: str
-    # session: requests.Session
-    # session: aiohttp.ClientSession
+    session: aiohttp.ClientSession
 
     def __init__(self, host: str, verify: bool, token: str = None):
         self.host = host
         self.token = token
         self.verify = verify
-        # self.session = requests.Session()
-        self.session = aiohttp.ClientSession()
-        # self.session.verify = verify
+        self.cookie_jar = aiohttp.CookieJar(unsafe=True)
+        self.session = aiohttp.ClientSession(cookie_jar=self.cookie_jar)
+        atexit.register(self.cleanup)
 
-        # if token:
-        #     self.session.headers.update({"x-auth-token": token})
+    def cleanup(self):
+        asyncio.run(self.session.close())
 
     async def ping(self):
         try:
@@ -30,32 +28,21 @@ class Session:
             return False
 
     async def get(self, url: str):
-        # headers = {"x-auth-token": self.token} if self.token else None
-        # async with aiohttp.ClientSession() as session:
-        async with self.session.get(self.host + url, ssl=self.verify) as response:
-            if response.status != 200:
-                raise Exception(f"get: error - {response.status}")
+        response = await self.session.get(self.host + url, ssl=self.verify) 
+        response.raise_for_status()
 
-            return await response.json()
+        return await response.json()
 
     async def post(self, url: str, data: dict):
-        # headers = {"x-auth-token": self.token} if self.token else None
-        # async with aiohttp.ClientSession() as session:
-        async with self.session.post(
+        response = await  self.session.post(
             self.host + url, data=data, ssl=self.verify
-        ) as response:
-            if response.status != 200:
-                raise Exception(f"post: error - {response.status}")
+        )
+        response.raise_for_status()
 
-            return await response.json()
+        return await response.json()
 
     def get_host(self):
         return self.host
 
-    # def get_session(self):
-    #     return self.session
-
     def set_token(self, token=None):
         self.token = token
-        # if token:
-        #     self.session.headers.update({"x-auth-token": token})

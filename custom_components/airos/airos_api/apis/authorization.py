@@ -26,5 +26,6 @@ class AuthorizationApi:
 
             return json
         except Exception as ex:
+            print(f"Failed to login: {ex}")
             self.logged_in = False
             raise Exception from ex
