@@ -1,5 +1,27 @@
+from dataclasses import dataclass
 from typing import Any
 from .apis import AuthorizationApi, StatusApi, Session
+
+
+@dataclass
+class AirOSStatus:
+    hostname: str
+    device_model: str
+    uptime: str
+    cpu: str
+    firmware_version: str
+    gps_lat: str
+    gps_lon: str
+    mac: str
+    distance: str
+    signal: str
+    rx_data_rate: str
+    snr: str
+    capacity: str
+    rx_throughput: str
+    tx_throughput: str
+    frequency: str
+    bandwidth: str
 
 
 class AirOSApi:
@@ -17,54 +39,56 @@ class AirOSApi:
 
         self.status = StatusApi(self.session)
 
-    def ping(self):
-        return self.session.ping()
+    async def ping(self):
+        return await self.session.ping()
 
-    def login(self, username: str, password: str):
+    async def login(self, username: str, password: str):
         try:
             if not self.authorization.is_logged_in():
-                self.authorization.login(username, password)
+                await self.authorization.login(username, password)
             return True
         except Exception as ex:
             return False
 
-    def get_local_status(self):
-        status = self.status.get_status()
-        return {
-            "hostname": status.host.hostname,
-            "device_model": status.host.devmodel,
-            "uptime": status.host.uptime,
-            "cpu": status.host.cpuload,
-            "firmware_version": status.host.fwversion,
-            "gps_lat": status.gps.lat,
-            "gps_lon": status.gps.lon,
-            "mac": status.wireless.apmac,
-            "distance": status.wireless.distance,
-            "signal": status.wireless.sta[0].prs_sta.rssi_data,
-            "rx_data_rate": status.wireless.sta[0].prs_sta.rx_mcs,
-            "snr": status.wireless.sta[0].prs_sta.snr,
-            "capacity": status.wireless.sta[0].prs_sta.capacity,
-            "rx_throughput": status.wireless.throughput.rx,
-            "tx_throughput": status.wireless.throughput.tx,
-            "frequency": status.wireless.prs_info.frequency,
-            "bandwidth": status.wireless.prs_info.chanbw,
-        }
+    async def get_local_status(self) -> AirOSStatus:
+        status = await self.status.get_status()
+        return AirOSStatus(
+            {
+                "hostname": status.host.hostname,
+                "device_model": status.host.devmodel,
+                "uptime": status.host.uptime,
+                "cpu": status.host.cpuload,
+                "firmware_version": status.host.fwversion,
+                "gps_lat": status.gps.lat,
+                "gps_lon": status.gps.lon,
+                "mac": status.wireless.apmac,
+                "distance": status.wireless.distance,
+                "signal": status.wireless.sta[0].prs_sta.rssi_data,
+                "rx_data_rate": status.wireless.sta[0].prs_sta.rx_mcs,
+                "snr": status.wireless.sta[0].prs_sta.snr,
+                "capacity": status.wireless.sta[0].prs_sta.capacity,
+                "rx_throughput": status.wireless.throughput.rx,
+                "tx_throughput": status.wireless.throughput.tx,
+                "frequency": status.wireless.prs_info.frequency,
+                "bandwidth": status.wireless.prs_info.chanbw,
+            }
+        )
 
     def get_host(self):
         return self.host
 
-    def get_hostname(self):
-        status = self.status.get_status()
+    async def get_hostname(self):
+        status = await self.status.get_status()
         return status.host.hostname
 
-    def get_device_id(self):
-        status = self.status.get_status()
+    async def get_device_id(self):
+        status = await self.status.get_status()
         return status.host.device_id
 
-    def test(self):
+    async def test(self):
         # dt_format = "%Y-%m-%dT%H:%M:%SZ"
 
-        status = self.status.get_status()
+        status = await self.status.get_status()
         # print(f"{status.host.devmodel=}")
         # print(f"{status.host.hostname=}")
         # print(f"{status.host.fwversion=}")
@@ -89,10 +113,10 @@ class AirOSApi:
         print(f"{status.wireless.prs_info.frequency=}")
         print(f"{status.wireless.prs_info.chanbw=}")
 
-        host = self.status.get_host()
+        host = await self.status.get_host()
         # print(f"{host.hostname=}")
 
-        local_status = self.status.get_local_status()
+        local_status = await self.status.get_local_status()
         # print(f"{local_status.signal=}")
         # print(f"{local_status.signal=}")
 
